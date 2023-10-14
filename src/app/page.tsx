@@ -1,95 +1,78 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client";
+
+import {Card, CardActionArea, CardContent, CardMedia, Grid, Typography} from "@mui/material";
+import {type} from "os";
+import {useEffect, useState} from "react";
+
+type PostType = {
+    userId: number;
+    id: number;
+    title: string;
+    body: string;
+};
+type PhotosType = {
+    albumId: number;
+    id: number;
+    title: string;
+    url: string;
+    thumbnailUrl: string;
+};
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    const [posts, setPosts] = useState<PostType[]>([]);
+    const [photos, setPhotos] = useState<PhotosType[]>([]);
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+    async function getDataFetching() {
+        const postRequest = fetch("https://jsonplaceholder.typicode.com/posts");
+        const photosRequest = fetch("https://jsonplaceholder.typicode.com/photos");
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+        const [postResponse, photosResponse] = await Promise.all([postRequest, photosRequest]);
+        const postJson = await postResponse.json();
+        const photosJson = await photosResponse.json();
+        setPosts(postJson);
+        setPhotos(photosJson);
+        // return;
+    }
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+    useEffect(() => {
+        getDataFetching();
+    }, []);
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
+    function cardLayout(post: PostType, index: number) {
+        return (
+            <>
+                <Grid item xs={12} sm={6} md={3} key={index} sx={{}}>
+                    <Card sx={{height: "100%", padding: "2px"}}>
+                        <CardActionArea sx={{height: "100%", padding: "5px"}}>
+                            <CardMedia
+                                component="img"
+                                height="140"
+                                image={photos[index].thumbnailUrl}
+                                alt={photos[index].title}
+                            />
+                            <CardContent sx={{height: "100%"}}>
+                                <Typography gutterBottom variant="h5" component="div">
+                                    {post.title}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {post.body}
+                                </Typography>
+                            </CardContent>
+                        </CardActionArea>
+                    </Card>
+                </Grid>
+            </>
+        );
+    }
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    return (
+        <>
+            <h1>Posts</h1>
+            <Grid container>
+                {posts.map((post, index) => {
+                    return cardLayout(post, index);
+                })}
+            </Grid>
+        </>
+    );
 }

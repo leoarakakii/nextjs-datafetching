@@ -67,7 +67,7 @@ export default function Home() {
 
     return (
         <>
-            <h1>Posts</h1>
+            <h1>Data Fecthing</h1>
             <Grid container>
                 {posts.map((post, index) => {
                     return cardLayout(post, index);

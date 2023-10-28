@@ -1,0 +1,8 @@
+"use client";
+export type PhotosType = {
+    albumId: number;
+    id: number;
+    title: string;
+    url: string;
+    thumbnailUrl: string;
+};
